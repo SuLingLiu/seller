@@ -22,7 +22,6 @@ import header from 'components/header/header';
 
 const ERR_OK = 0;
 
-// ???? created的在什么时候被调用，以及data,components
 export default {
   data() {
     return {

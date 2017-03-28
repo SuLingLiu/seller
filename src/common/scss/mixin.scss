@@ -14,22 +14,26 @@
 //px换上成rem
 @mixin px2rem($property,$px-values,$baseline-px:75px,$support-for-ie:false){
     //Conver the baseline into rems
-    $baseline-rem: $baseline-px / 1rem * 1;
+    // $baseline-rem: $baseline-px / 1rem * 1;
+    // @debug  #{$baseline-rem};
     //Print the first line in pixel values
     @if $support-for-ie {
         #{$property}: $px-values;
     }
     //if there is only one (numeric) value, return the property/value line for it.
     @if type-of($px-values) == "number"{
-        #{$property}: $px-values / $baseline-rem;
+        #{$property}: $px-values / $baseline-px * 1rem;
+        @debug  #{$property};
     }
     @else {
         //Create an empty list that we can dump values into
+        // example padding: 10px 20px;
         $rem-values:();
         @each $value in $px-values{
             // If the value is zero or not a number, return it
-            @if $value == 0 or type-of($value) != "number"{
-                $rem-values: append($rem-values, $value / $baseline-rem);
+            @if type-of($value) == "number"{
+                
+                $rem-values: append($rem-values, $value / $baseline-px * 1rem);
             }
         }
         // Return the property and its list of converted values
