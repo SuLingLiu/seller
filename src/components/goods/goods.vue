@@ -12,7 +12,7 @@
 
     <div class="foods-wrapper" v-el:food-wrapper>
       <ul>
-        <li class="food-list" v-for="item in goods">
+        <li class="food-list food-list-hook" v-for="item in goods">
           <h2 class="title">{{item.name}}</h2>
             <ul class="food-item-wrap">
               <li class="food-item" v-for="food in item.foods">
@@ -26,7 +26,7 @@
                     <span class="count">月售{{food.sellCount || 0}}份</span><span>好评率{{food.rating || 0}}%</span>
                   </div>
 
-                   <div class="price">
+                  <div class="price">
                     <span class="now">￥{{food.price}}</span>
                     <span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
                   </div>
@@ -36,17 +36,21 @@
         </li>
       </ul>
     </div>
+
+    <shopcart></shopcart>
   </div>
 </template>
 
 <script type="text-ecmascript-6">
   import BScroll from 'better-scroll';
+  import shopcart from 'components/shopcart/shopcart';
 
   const ERR_OK = 0;
   export default {
     data () {
       return {
-        goods: []
+        goods: [],
+        listHeight: []//用来存放右侧列表的区间高
       };
     },
     created () {
@@ -72,8 +76,21 @@
         this.foodsScroll = new BScroll(this.$els.foodWrapper,{});
       },
       _calculateHeight () {
+        //food-list-hook这里添加的class只用来操作dom
+        let foodList = this.$els.foodWrapper.getElementsByClassName('food-list-hook');
+
+        let height = 0;
+        this.listHeight.push(height);
+        for(var i=0; i<foodList.length; i++) {
+          let item = foodList[i];
+          height += item.clientHeight;
+          this.listHeight.push(height);
+        }
 
       }
+    },
+    components: {
+      shopcart
     }
   };
 </script>
@@ -83,7 +100,7 @@
 	.goods {
     position: absolute;
     @include px2rem('top', 352px);
-    @include px2rem('bottom', 92px);
+    @include px2rem('bottom', 96px);
     display: flex;
     width: 100%;
     overflow: hidden;
