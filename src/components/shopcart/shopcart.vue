@@ -6,11 +6,12 @@
 					<div class="logo">
 						<span class="icon-shopping_cart"></span>
 					</div>
+					<span class="num">{{totalCount}}</span>
 				</div>
-				<div class="price">￥0</div>
-				<div class="desc">另需配送费￥4元</div>
+				<div class="price">￥{{totalPrice}}</div>
+				<div class="desc">另需配送费￥{{deliveryPrice}}元</div>
 			</div>
-			<div class="content-right"><span>￥20元起送</span></div>
+			<div class="content-right"><span class="pay">￥{{minPrice}}元起送</span></div>
 		</div>
 	</div>
 </template>
@@ -18,9 +19,45 @@
 <script type="text-ecmascript-6">
 
   export default {
+  	props: {
+  		selectFoods: {//已选择的商品
+  			type: Array,
+  			default () {
+  				return [
+  					{
+  						price: 10,
+  						count: 1
+  					}
+  				];
+  			}
+  		},
+  		deliveryPrice: {
+  			type: Number
+  		},
+  		minPrice: {
+  			type: Number
+  		} 
+  	},
     data () {
       return {};
+    },
+    computed: {
+    	totalPrice() {
+    		let total = 0;
+    		this.selectFoods.forEach((food) => {
+    			total += food.price * food.count;
+    		});
+    		return total;
+    	},
+    	totalCount() {
+    		let count = 0;
+    		this.selectFoods.forEach((food) => {
+    			count += food.count;
+    		});
+    		return count;
+    	}
     }
+
   }
 </script>
 
@@ -69,6 +106,14 @@
 						@include px2rem(font-size, 48px);
 						text-align: center;
 					}
+					.num {
+						position: absolute;
+						top: 0;
+						right: 0;
+						@include px2rem(width, 48px);
+						@include px2rem(height, 32px);
+
+					}
 				}
 				.price, .desc {
 					@extend %shop-text;
@@ -87,7 +132,7 @@
 				@include px2rem(width, 210px);
 				background: #2b333b;
 				text-align: center;
-				span {
+				.pay {
 					@extend %shop-text;
 				}
 			}
