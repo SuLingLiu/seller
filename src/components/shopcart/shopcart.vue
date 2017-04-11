@@ -3,15 +3,15 @@
 		<div class="content">
 			<div class="content-left">
 				<div class="logo-wrapper">
-					<div class="logo">
+					<div class="logo" :class="{'highlight':totalCount>0}">
 						<span class="icon-shopping_cart"></span>
 					</div>
-					<span class="num">{{totalCount}}</span>
+					<span class="num" v-show="totalCount>0">{{totalCount}}</span>
 				</div>
-				<div class="price">￥{{totalPrice}}</div>
+				<div class="price" :class="{'highlight':totalCount>0}">￥{{totalPrice}}</div>
 				<div class="desc">另需配送费￥{{deliveryPrice}}元</div>
 			</div>
-			<div class="content-right"><span class="pay">￥{{minPrice}}元起送</span></div>
+			<div class="content-right" :class="payClass"><span class="pay">{{payDesc}}</span></div>
 		</div>
 	</div>
 </template>
@@ -25,7 +25,7 @@
   			default () {
   				return [
   					{
-  						price: 10,
+  						price: 20,
   						count: 1
   					}
   				];
@@ -55,6 +55,23 @@
     			count += food.count;
     		});
     		return count;
+    	},
+    	payDesc() {
+    		if(this.totalPrice === 0) {
+    			return `￥${this.minPrice}元起送`;
+    		}else if(this.totalPrice<this.minPrice) {
+    			let diff = this.minPrice - this.totalPrice;
+    			return `还差￥${diff}元`;
+    		}else {
+    			return '去结算';
+    		}
+    	},
+    	payClass() {
+    		if(this.totalPrice<this.minPrice) {
+    			return 'not-enough';
+    		}else {
+    			return 'enough';
+    		}
     	}
     }
 
@@ -105,6 +122,10 @@
 						background: #2b343c;
 						@include px2rem(font-size, 48px);
 						text-align: center;
+						&.highlight {
+							background: rgb(0,160,220);
+							color: #fff;
+						}
 					}
 					.num {
 						position: absolute;
@@ -128,6 +149,9 @@
 					@include px2rem(padding-right, 24px);
 					border-right: 1px solid rgba(255,255,255,0.1);
 					font-weight: 700;
+					&.highlight {
+						color: #fff;
+					}
 				}
 				.desc {
 					@include px2rem(padding-left, 24px);
@@ -137,6 +161,10 @@
 				@include px2rem(width, 210px);
 				background: #2b333b;
 				text-align: center;
+				&.enough {
+					background: #00a0dc;
+					color: #fff;
+				}
 				.pay {
 					@extend %shop-text;
 				}
