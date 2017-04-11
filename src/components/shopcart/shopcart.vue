@@ -112,7 +112,13 @@
 						right: 0;
 						@include px2rem(width, 48px);
 						@include px2rem(height, 32px);
-
+						background: rgb(240,20,20);
+						@include px2rem(line-height, 32px);
+						@include px2rem(font-size, 18px);
+						color: #fff;
+						font-weight: 700;
+						text-align: center;
+						@include px2rem(border-radius, 18px);
 					}
 				}
 				.price, .desc {
@@ -128,7 +134,6 @@
 				}
 			}
 			.content-right {
-
 				@include px2rem(width, 210px);
 				background: #2b333b;
 				text-align: center;
@@ -136,7 +141,6 @@
 					@extend %shop-text;
 				}
 			}
-
 		}
 	}
 </style>

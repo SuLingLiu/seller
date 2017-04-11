@@ -2,7 +2,7 @@
 	<div class="goods">
     <div class="menu-wrapper" v-el:menu-wrapper>
       <ul>
-        <li class="menu-item" v-for="item in goods">
+        <li class="menu-item" :class="{'current':currentIndex == $index}" v-for="item in goods" @click="selectMenu($index,$event)">
           <span class="text">
             <span class="icon" v-show="item.type>=0" :class="classMap[item.type]"></span>{{item.name}}
           </span>
@@ -55,8 +55,22 @@
     data () {
       return {
         goods: [],
-        listHeight: []//用来存放右侧列表的区间高
+        listHeight: [],//用来存放右侧列表的区间高
+        scrollY: 0
       };
+    },
+    computed: {
+      currentIndex() {
+        for(let i=0; i<this.listHeight.length; i++) {
+          let height1 = this.listHeight[i];
+          let height2 = this.listHeight[i+1];
+          if(height2 && (this.scrollY>=height1 && this.scrollY < height2)) {
+            return i;
+          }
+        }
+
+        return 0;
+      }
     },
     created () {
       this.classMap = ['decrease', 'discount', 'guarantee', 'invoice', 'special'];
@@ -77,8 +91,16 @@
     },
     methods: {
       _initScroll () {
-        this.meunScroll = new BScroll(this.$els.menuWrapper,{});
-        this.foodsScroll = new BScroll(this.$els.foodWrapper,{});
+        this.meunScroll = new BScroll(this.$els.menuWrapper,{
+          click: true//让滚动区的元素可以点击
+        });
+        this.foodsScroll = new BScroll(this.$els.foodWrapper,{
+          probeType: 3//添加这个属性，是要告诉我们滚动条实时的位置
+        });
+
+        this.foodsScroll.on('scroll',(pos) => {
+          this.scrollY = Math.abs(Math.round(pos.y));
+        })
       },
       _calculateHeight () {
         //food-list-hook这里添加的class只用来操作dom
@@ -91,6 +113,15 @@
           height += item.clientHeight;
           this.listHeight.push(height);
         }
+      },
+      selectMenu(index,event) {
+        //在PC端点击会触发两次
+        if(!event._constructed) {//这个属性，浏览器原生的是没有这个属性的
+          return false;
+        } 
+        let foodList = this.$els.foodWrapper.getElementsByClassName('food-list-hook');
+        let el = foodList[index];
+        this.foodsScroll.scrollToElement(el,300);
 
       }
     },
@@ -119,8 +150,10 @@
         @include px2rem('height', 108px);
         display: table;
         color: rgb(7,85,93);
-
-        &.active {
+        width: 100%;
+        box-sizing: border-box;
+        text-align: center;
+        &.current {
           background: #fff;
           color: rgb(240,20,20);
         }
