@@ -1,10 +1,10 @@
 <template>
 	<div class="cartcontrol">
-		<div class="cart cart-decrease" v-show="food.count>0" @click="decreaseCart($event)" transition="move">
+		<div class="cart cart-decrease" v-show="food.count>0" @click.stop.prevent="decreaseCart($event)" transition="move">
 			<div class="inner icon-remove_circle_outline"></div>
 		</div>
 		<div class="cart cart-count" v-show="food.count>0">{{food.count}}</div>
-		<div class="cart cart-add" @click="addCart($event)">
+		<div class="cart cart-add" @click.stop.prevent="addCart($event)">
 			<div class="inner icon-add_circle"></div>
 		</div>
 	</div>
@@ -31,10 +31,14 @@
 	        } 
     		if(!this.food.count) {
     			//this.food.count = 1;//直接添加一个data里不存在的属性时，是不能被观测到
+    			//子组件的数据发生变化，父组件的数据也会发生变化
     			Vue.set(this.food,'count', 1);
     		}else {
     			this.food.count ++;
     		}
+
+    		//派发事件
+    		this.$dispatch('cart.add',event.target);
     	},
     	decreaseCart() {
     		if(!event._constructed) {//这个属性，浏览器原生的是没有这个属性的
@@ -52,6 +56,7 @@
 	@import "../../common/scss/mixin.scss";
 	.cartcontrol {
 		font-size: 0;
+		overflow: hidden;
 		.cart {
 			display: inline-block;
 			vertical-align: top;
@@ -76,7 +81,7 @@
 			}
 			&.move-enter,&.move-leave {
 				opacity: 0;
-				transform: translate3D(24px,0,0);
+				transform: translate3d(24px,0,0);
 				.inner {
 					transform: rotate(180deg);
 				}

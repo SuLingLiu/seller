@@ -12,10 +12,10 @@
 
     <div class="foods-wrapper" v-el:food-wrapper>
       <ul>
-        <li class="food-list food-list-hook" v-for="item in goods">
+        <li class="food-list food-list-hook" v-for="item in goods" >
           <h2 class="title">{{item.name}}</h2>
             <ul class="food-item-wrap">
-              <li class="food-item" v-for="food in item.foods">
+              <li class="food-item" v-for="food in item.foods" @click="selectFood(food,$event)">
                 <div class="icon">
                   <img :src="food.icon">
                 </div>
@@ -40,14 +40,16 @@
       </ul>
     </div>
 
-    <shopcart :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
+    <shopcart v-ref:shopcart :select-foods="selectFoods" :delivery-price="seller.deliveryPrice" :min-price="seller.minPrice"></shopcart>
   </div>
+  <food :food="selectedFood" v-ref:food></food>
 </template>
 
 <script type="text-ecmascript-6">
   import BScroll from 'better-scroll';
   import shopcart from 'components/shopcart/shopcart';
   import cartcontrol from 'components/cartcontrol/cartcontrol';
+  import food from 'components/food/food';
 
   const ERR_OK = 0;
   export default {
@@ -60,7 +62,8 @@
       return {
         goods: [],
         listHeight: [],//用来存放右侧列表的区间高
-        scrollY: 0
+        scrollY: 0,
+        selectedFood: {}
       };
     },
     computed: {
@@ -74,6 +77,18 @@
         }
 
         return 0;
+      },
+      selectFoods() {
+        let foods = [];
+        //这里的this.goods发生变化，他就会重新被计算
+        this.goods.forEach((good) => {
+          good.foods.forEach((food) => {
+            if(food.count) {
+              foods.push(food);
+            }
+          })
+        })
+        return foods;
       }
     },
     created () {
@@ -94,6 +109,14 @@
       });
     },
     methods: {
+      _drop(target) {
+        //调用子组件的方法 v-ref:shopcart,写到nextTick里是为了让抛小球的效果，晚点触发，这样减得效果，和抛小球的效果就不会那么卡
+        //体验优化，异步执行下落动画
+        this.$nextTick(() => {
+          this.$refs.shopcart.drop(target);
+        })
+
+      },
       _initScroll () {
         this.meunScroll = new BScroll(this.$els.menuWrapper,{
           click: true//让滚动区的元素可以点击
@@ -127,12 +150,24 @@
         let foodList = this.$els.foodWrapper.getElementsByClassName('food-list-hook');
         let el = foodList[index];
         this.foodsScroll.scrollToElement(el,300);
-
+      },
+      selectFood(food,event) {
+        if(!event._constructed) {//这个属性，浏览器原生的是没有这个属性的
+          return false;
+        } 
+        this.selectedFood = food;
+        this.$refs.food.show();
+      }
+    },
+    events: {
+      'cart.add'(target) {
+        this._drop(target);
       }
     },
     components: {
       shopcart,
-      cartcontrol
+      cartcontrol,
+      food
     }
   };
 </script>
