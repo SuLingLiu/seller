@@ -15,7 +15,7 @@
     "better-scroll": "^0.1.15",
     "vue": "^1.0.21",
     "vue-resource": "^1.2.1",
-    "vue-router": "^2.3.0"
+    "vue-router": "^0.7.13"
   },
   "devDependencies": {
     "babel-core": "^6.0.0",
