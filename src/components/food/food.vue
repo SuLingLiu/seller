@@ -40,13 +40,13 @@
                 <span class="name">{{rating.username}}</span>
                 <img :src="rating.avatar" class="avatar">
               </div>
-              <div class="time">{{rating.rateTime}}</div>
+              <div class="time">{{rating.rateTime | formatDate}}</div>
               <p class="text">
                 <span :class="{'icon-thumb_up': rating.rateType===0,'icon-thumb_down': rating.rateType ===1}"></span>{{rating.text}}
               </p>
             </li>
           </ul>
-          <div v-show="!food.ratings || !food.ratings.length"></div>
+          <div class="no-rating" v-show="!food.ratings || !food.ratings.length">暂无评价</div>
         </div>
       </div>
     </div>
@@ -59,6 +59,7 @@
   import split from 'components/split/split';
   import ratingselect from 'components/ratingselect/ratingselect';
   import Vue from 'vue';
+  import {formatDate} from 'common/js/date';
   // const POSITIVE = 0;
   // const NEGATIVE = 1;
   const ALL = 2;
@@ -102,7 +103,7 @@
       addFist(event) {
         if(!event._constructed) {//这个属性，浏览器原生的是没有这个属性的
           return false;
-        } 
+        }
         //派发事件
         this.$dispatch('cart.add',event.target);//抛小球的动画计算时该元素display:none，获取不准，要解决这个问题可以给这个buy加动画
         Vue.set(this.food,'count',1);
@@ -133,6 +134,12 @@
         });
       }
     },
+    filters: {
+      formatDate(time) {
+        let date = new Date(time);
+        return formatDate(date,'yyyy-MM-dd hh:mm');
+      }
+    },
     components: {
       cartcontrol,
       split,
@@ -159,7 +166,7 @@
     &.move-enter, &.move-leave {
       transform: translate3d(100%,0,0);
     }
-    
+
     //以下的这个处理，是因为图片加载时异步的的，高度不能写死，根据宽度来变化，如果不做处理会抖动，padding-top:100%是相对于width来的，
     .image-header {
       position: relative;
@@ -324,6 +331,13 @@
               color: rgb(147,153,159);
             }
           }
+        }
+        .no-rating {
+           @include px2rem(padding, 36px 0px);
+           @include px2rem(font-size, 24px);
+           @include px2rem(line-height, 48px);
+           color: rgb(147,153,159);
+           text-align: center;
         }
       }
     }
